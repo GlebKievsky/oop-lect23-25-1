@@ -1,0 +1,3919 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Поліморфізм у C# — Інтерактивний урок</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ===== THEME SYSTEM ===== */
+      :root {
+        color-scheme: light dark;
+      }
+
+      [data-theme="light"] {
+        --bg: #f5f0e8;
+        --bg2: #ede8dc;
+        --bg3: #e0d9cc;
+        --surface: #ffffff;
+        --surface2: #faf7f2;
+        --border: #d4ccc0;
+        --text: #1a1612;
+        --text2: #4a4035;
+        --text3: #7a7065;
+        --accent: #c0392b;
+        --accent2: #e74c3c;
+        --accent3: #ff6b5b;
+        --green: #27ae60;
+        --blue: #2980b9;
+        --purple: #8e44ad;
+        --orange: #e67e22;
+        --yellow: #f39c12;
+        --code-bg: #1e1e1e;
+        --code-text: #d4d4d4;
+        --shadow: rgba(0, 0, 0, 0.08);
+        --shadow2: rgba(0, 0, 0, 0.15);
+        --highlight: #fff3cd;
+        --highlight-border: #ffc107;
+      }
+
+      [data-theme="dark"] {
+        --bg: #0f0e0c;
+        --bg2: #1a1816;
+        --bg3: #252220;
+        --surface: #1e1c1a;
+        --surface2: #252220;
+        --border: #3a3530;
+        --text: #f0ebe3;
+        --text2: #c0b8ae;
+        --text3: #7a7268;
+        --accent: #ff6b5b;
+        --accent2: #ff8a7a;
+        --accent3: #ffaa9a;
+        --green: #2ecc71;
+        --blue: #3498db;
+        --purple: #9b59b6;
+        --orange: #e67e22;
+        --yellow: #f1c40f;
+        --code-bg: #0d1117;
+        --code-text: #e6edf3;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --shadow2: rgba(0, 0, 0, 0.5);
+        --highlight: #2d2200;
+        --highlight-border: #b8860b;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        [data-theme="system"] {
+          --bg: #0f0e0c;
+          --bg2: #1a1816;
+          --bg3: #252220;
+          --surface: #1e1c1a;
+          --surface2: #252220;
+          --border: #3a3530;
+          --text: #f0ebe3;
+          --text2: #c0b8ae;
+          --text3: #7a7268;
+          --accent: #ff6b5b;
+          --accent2: #ff8a7a;
+          --accent3: #ffaa9a;
+          --green: #2ecc71;
+          --blue: #3498db;
+          --purple: #9b59b6;
+          --orange: #e67e22;
+          --yellow: #f1c40f;
+          --code-bg: #0d1117;
+          --code-text: #e6edf3;
+          --shadow: rgba(0, 0, 0, 0.3);
+          --shadow2: rgba(0, 0, 0, 0.5);
+          --highlight: #2d2200;
+          --highlight-border: #b8860b;
+        }
+      }
+
+      @media (prefers-color-scheme: light) {
+        [data-theme="system"] {
+          --bg: #f5f0e8;
+          --bg2: #ede8dc;
+          --bg3: #e0d9cc;
+          --surface: #ffffff;
+          --surface2: #faf7f2;
+          --border: #d4ccc0;
+          --text: #1a1612;
+          --text2: #4a4035;
+          --text3: #7a7065;
+          --accent: #c0392b;
+          --accent2: #e74c3c;
+          --accent3: #ff6b5b;
+          --green: #27ae60;
+          --blue: #2980b9;
+          --purple: #8e44ad;
+          --orange: #e67e22;
+          --yellow: #f39c12;
+          --code-bg: #1e1e1e;
+          --code-text: #d4d4d4;
+          --shadow: rgba(0, 0, 0, 0.08);
+          --shadow2: rgba(0, 0, 0, 0.15);
+          --highlight: #fff3cd;
+          --highlight-border: #ffc107;
+        }
+      }
+
+      /* ===== RESET & BASE ===== */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        font-size: 16px;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Nunito", sans-serif;
+        line-height: 1.7;
+        transition:
+          background 0.3s,
+          color 0.3s;
+        min-height: 100vh;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.6;
+      }
+
+      /* ===== HEADER ===== */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 2px solid var(--border);
+        padding: 0.75rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 2px 20px var(--shadow);
+      }
+      .header-brand {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.3rem;
+        color: var(--accent);
+        letter-spacing: -0.03em;
+        text-decoration: none;
+      }
+      .header-brand span {
+        color: var(--text2);
+        font-weight: 400;
+      }
+      .theme-switcher {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        padding: 0.25rem;
+      }
+      .theme-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text3);
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-family: "Nunito", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .theme-btn.active {
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 2px 8px var(--shadow2);
+      }
+      .theme-btn:hover:not(.active) {
+        color: var(--text);
+        background: var(--bg3);
+      }
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--accent),
+          var(--orange),
+          var(--yellow)
+        );
+        width: 0%;
+        z-index: 200;
+        transition: width 0.1s;
+      }
+      .page-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 6rem;
+      }
+
+      /* ===== HERO & GENERAL ===== */
+      .hero {
+        text-align: center;
+        padding: 4rem 1rem 3rem;
+        position: relative;
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text3);
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .hero h1 {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: clamp(2.5rem, 6vw, 4rem);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        color: var(--text);
+        margin-bottom: 1rem;
+      }
+      .hero h1 .accent {
+        color: var(--accent);
+      }
+      .hero-desc {
+        font-size: 1.15rem;
+        color: var(--text2);
+        max-width: 560px;
+        margin: 0 auto 2rem;
+        font-weight: 600;
+      }
+      .hero-decoration {
+        position: absolute;
+        top: 1rem;
+        right: -2rem;
+        font-size: 8rem;
+        opacity: 0.06;
+        pointer-events: none;
+        transform: rotate(-15deg);
+        user-select: none;
+      }
+
+      .dialogue-container {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        margin: 2rem 0;
+        box-shadow: 6px 6px 0 var(--border);
+      }
+      .dialogue-header {
+        background: var(--bg2);
+        border-bottom: 2px solid var(--border);
+        padding: 0.75rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .dialogue-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dot-red {
+        background: #ff5f57;
+      }
+      .dot-yellow {
+        background: #ffbd2e;
+      }
+      .dot-green {
+        background: #28ca41;
+      }
+      .dialogue-body {
+        padding: 1.5rem;
+      }
+      .message {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        animation: fadeInUp 0.4s ease both;
+      }
+      .message:last-child {
+        margin-bottom: 0;
+      }
+      .avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        border: 2px solid var(--border);
+      }
+      .avatar-teacher {
+        background: var(--accent);
+        color: white;
+      }
+      .avatar-student {
+        background: var(--blue);
+        color: white;
+      }
+      .bubble {
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 0.9rem 1.1rem;
+        flex: 1;
+        font-size: 1rem;
+        color: var(--text2);
+        font-weight: 600;
+        position: relative;
+      }
+      .bubble.teacher {
+        border-color: var(--accent);
+        border-left-width: 4px;
+      }
+      .bubble.student {
+        border-color: var(--blue);
+        border-left-width: 4px;
+      }
+      .speaker-name {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.3rem;
+      }
+      .name-teacher {
+        color: var(--accent);
+      }
+      .name-student {
+        color: var(--blue);
+      }
+
+      .section {
+        margin: 3rem 0;
+        scroll-margin-top: 5rem;
+      }
+      .section-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.6rem;
+        letter-spacing: -0.03em;
+        color: var(--text);
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .section-num {
+        background: var(--accent);
+        color: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+      .prose {
+        color: var(--text2);
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        line-height: 1.75;
+      }
+      .prose strong {
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .info-card {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        margin: 1.25rem 0;
+        box-shadow: 4px 4px 0 var(--border);
+      }
+      .info-card.tip {
+        border-color: var(--green);
+        box-shadow: 4px 4px 0 rgba(39, 174, 96, 0.3);
+      }
+      .info-card.warning {
+        border-color: var(--orange);
+        box-shadow: 4px 4px 0 rgba(230, 126, 34, 0.3);
+      }
+      .info-card.important {
+        border-color: var(--accent);
+        box-shadow: 4px 4px 0 rgba(192, 57, 43, 0.3);
+      }
+      .info-card.info {
+        border-color: var(--blue);
+        box-shadow: 4px 4px 0 rgba(41, 128, 185, 0.3);
+      }
+      .card-label {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.6rem;
+      }
+      .tip .card-label {
+        color: var(--green);
+      }
+      .warning .card-label {
+        color: var(--orange);
+      }
+      .important .card-label {
+        color: var(--accent);
+      }
+      .info .card-label {
+        color: var(--blue);
+      }
+
+      .code-block {
+        background: var(--code-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        margin: 1.25rem 0;
+        border: 1.5px solid #333;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .code-header {
+        background: #2d2d2d;
+        padding: 0.6rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #404040;
+      }
+      .code-lang {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        color: #888;
+        font-weight: 500;
+      }
+      .copy-btn {
+        background: none;
+        border: 1px solid #555;
+        color: #aaa;
+        cursor: pointer;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-family: "JetBrains Mono", monospace;
+        transition: all 0.2s;
+      }
+      .copy-btn:hover {
+        background: #444;
+        color: white;
+      }
+      .copy-btn.copied {
+        border-color: var(--green);
+        color: var(--green);
+      }
+      .code-body {
+        padding: 1.25rem 1.5rem;
+        overflow-x: auto;
+      }
+      .code-body pre {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: var(--code-text);
+        margin: 0;
+      }
+      .kw {
+        color: #569cd6;
+        font-weight: 700;
+      }
+      .cls {
+        color: #4ec9b0;
+      }
+      .fn {
+        color: #dcdcaa;
+      }
+      .str {
+        color: #ce9178;
+      }
+      .cmt {
+        color: #6a9955;
+        font-style: italic;
+      }
+
+      .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.25rem 0;
+        font-size: 0.95rem;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 4px 4px 0 var(--border);
+      }
+      .compare-table th {
+        background: var(--bg2);
+        color: var(--text);
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        padding: 0.85rem 1.1rem;
+        text-align: left;
+        border-bottom: 2px solid var(--border);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .compare-table td {
+        padding: 1rem 1.1rem;
+        border-bottom: 1.5px solid var(--border);
+        vertical-align: top;
+        color: var(--text2);
+        font-weight: 600;
+      }
+      .compare-table tr:last-child td {
+        border-bottom: none;
+      }
+      .compare-table tr:nth-child(even) td {
+        background: var(--surface2);
+      }
+
+      .output-box {
+        background: var(--bg3);
+        border: 1.5px solid var(--border);
+        border-left: 4px solid var(--green);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9rem;
+        color: var(--green);
+        margin: 0.5rem 0;
+      }
+      .output-label {
+        font-family: "Syne", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text3);
+        margin-bottom: 0.35rem;
+      }
+
+      .demo-section,
+      .quiz-section,
+      .trace-box,
+      .builder-box,
+      .cast-sim,
+      .flash-box,
+      .sort-box,
+      .score-widget {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        padding: 1.75rem;
+        margin: 2rem 0;
+        box-shadow: 6px 6px 0 var(--border);
+      }
+      .demo-title,
+      .quiz-title,
+      .trace-title,
+      .builder-title,
+      .cast-sim-title,
+      .flash-title,
+      .sort-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .demo-desc,
+      .trace-desc,
+      .builder-desc,
+      .cast-sim-desc,
+      .flash-desc,
+      .sort-desc {
+        color: var(--text3);
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+      }
+
+      .animal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+      }
+      .animal-card {
+        background: var(--bg2);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+      }
+      .animal-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px var(--shadow2);
+      }
+      .animal-card.selected {
+        border-color: var(--accent);
+        background: var(--highlight);
+        box-shadow: 4px 4px 0 var(--accent);
+      }
+      .animal-emoji {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 0.4rem;
+      }
+      .animal-name {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--text);
+      }
+      .animal-type {
+        font-size: 0.75rem;
+        color: var(--text3);
+        font-weight: 600;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .demo-output {
+        background: var(--code-bg);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        min-height: 80px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9rem;
+        color: #6a9955;
+        border: 1.5px solid #333;
+        transition: all 0.3s;
+      }
+      .demo-output.active {
+        color: var(--green);
+      }
+
+      .quiz-question {
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: var(--text);
+        font-size: 1rem;
+      }
+      .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .quiz-option {
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 0.8rem 1.1rem;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--text2);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9rem;
+      }
+      .quiz-option:hover:not(.answered) {
+        border-color: var(--accent);
+        background: var(--highlight);
+      }
+      .quiz-option.correct {
+        border-color: var(--green);
+        background: rgba(39, 174, 96, 0.1);
+        color: var(--green);
+      }
+      .quiz-option.wrong {
+        border-color: var(--accent);
+        background: rgba(192, 57, 43, 0.1);
+        color: var(--accent);
+      }
+      .option-letter {
+        width: 28px;
+        height: 28px;
+        background: var(--bg3);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+      }
+      .quiz-feedback {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 10px;
+        font-weight: 700;
+        display: none;
+      }
+      .quiz-feedback.show {
+        display: block;
+        animation: fadeInUp 0.3s ease;
+      }
+      .quiz-feedback.ok {
+        background: rgba(39, 174, 96, 0.1);
+        border: 1.5px solid var(--green);
+        color: var(--green);
+      }
+      .quiz-feedback.fail {
+        background: rgba(192, 57, 43, 0.1);
+        border: 1.5px solid var(--accent);
+        color: var(--accent);
+      }
+
+      .retry-btn {
+        margin-top: 0.85rem;
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: transparent;
+        border: 1.5px solid currentColor;
+        color: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .retry-btn:hover {
+        background: currentColor;
+        color: var(--surface);
+      }
+
+      .divider {
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
+        margin: 3rem 0;
+        border-radius: 2px;
+        opacity: 0.3;
+      }
+      .mega-note {
+        background: linear-gradient(135deg, var(--highlight), var(--surface));
+        border: 2px solid var(--highlight-border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .mega-note-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+      }
+      .mega-note-text {
+        color: var(--text2);
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      .mega-note-text strong {
+        color: var(--text);
+      }
+
+      /* ===== ULTIMATE RULE ===== */
+      .ultimate-rule {
+        position: relative;
+        background: linear-gradient(
+          135deg,
+          rgba(230, 126, 34, 0.1),
+          rgba(192, 57, 43, 0.15)
+        );
+        border: 3px solid var(--accent);
+        border-radius: 20px;
+        padding: 3rem 2.5rem 2rem;
+        margin: 4rem 0;
+        box-shadow:
+          0 0 25px rgba(192, 57, 43, 0.3),
+          inset 0 0 15px rgba(230, 126, 34, 0.1);
+        animation: ultimateGlow 2s infinite alternate;
+      }
+      @keyframes ultimateGlow {
+        from {
+          box-shadow:
+            0 0 15px rgba(192, 57, 43, 0.3),
+            inset 0 0 10px rgba(230, 126, 34, 0.1);
+          border-color: var(--orange);
+        }
+        to {
+          box-shadow:
+            0 0 35px rgba(192, 57, 43, 0.6),
+            inset 0 0 25px rgba(230, 126, 34, 0.2);
+          border-color: var(--accent);
+        }
+      }
+      .ultimate-rule-badge {
+        position: absolute;
+        top: -24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, var(--accent), var(--orange));
+        color: white;
+        padding: 0.6rem 2rem;
+        border-radius: 50px;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        white-space: nowrap;
+        animation: pulseBadge 2s infinite;
+        z-index: 10;
+      }
+      @keyframes pulseBadge {
+        0%,
+        100% {
+          transform: translateX(-50%) scale(1);
+        }
+        50% {
+          transform: translateX(-50%) scale(1.05);
+        }
+      }
+      @media (max-width: 600px) {
+        .ultimate-rule-badge {
+          font-size: 0.85rem;
+          padding: 0.5rem 1rem;
+          top: -18px;
+        }
+        .ultimate-rule {
+          padding: 2.5rem 1.5rem 1.5rem;
+        }
+      }
+      .ultimate-rule-content {
+        font-size: 1.25rem;
+        line-height: 1.7;
+        color: var(--text);
+        text-align: center;
+      }
+      .ultimate-rule-content strong {
+        color: var(--accent);
+        background: var(--highlight);
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-size: 1.4rem;
+        border: 1px solid var(--highlight-border);
+        display: inline-block;
+        margin: 0.2rem;
+        box-shadow: 2px 2px 0 var(--highlight-border);
+      }
+      .ultimate-rule-icon {
+        font-size: 3.5rem;
+        display: block;
+        margin-bottom: 1rem;
+        text-align: center;
+        animation: floatUltimate 3s ease-in-out infinite;
+      }
+      @keyframes floatUltimate {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .final-card {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-align: center;
+        margin: 3rem 0;
+        box-shadow: 8px 8px 0 var(--border);
+      }
+      .final-emoji {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 1rem;
+      }
+      .final-card h2 {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.8rem;
+        letter-spacing: -0.03em;
+        color: var(--text);
+        margin-bottom: 0.75rem;
+      }
+      .final-card p {
+        color: var(--text2);
+        font-weight: 600;
+        font-size: 1.05rem;
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-in {
+        animation: fadeInUp 0.5s ease both;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg2);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+      }
+
+      /* two-col table for code+desc */
+      .code-table {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1.25rem 0;
+      }
+      @media (max-width: 700px) {
+        .code-table {
+          grid-template-columns: 1fr;
+        }
+      }
+      .code-table-desc {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+        color: var(--text2);
+        font-weight: 600;
+        line-height: 1.7;
+        word-break: break-word;
+      }
+
+      /* ===== NEW INTERACTIVE CLASSES ===== */
+      .toc-nav {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        margin: 2rem 0;
+        box-shadow: 4px 4px 0 var(--border);
+      }
+      .toc-label {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text3);
+        margin-bottom: 0.9rem;
+      }
+      .toc-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.55rem 0.85rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text2);
+        font-weight: 700;
+        font-size: 0.92rem;
+        border: 1.5px solid transparent;
+        text-decoration: none;
+      }
+      .toc-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+        color: var(--text);
+      }
+      .toc-num {
+        width: 26px;
+        height: 26px;
+        background: var(--bg3);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.78rem;
+        color: var(--text3);
+        flex-shrink: 0;
+        transition: all 0.2s;
+      }
+      .toc-item:hover .toc-num {
+        background: var(--accent);
+        color: white;
+      }
+      .toc-check {
+        margin-left: auto;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        background: transparent;
+        transition: all 0.3s;
+        flex-shrink: 0;
+      }
+      .toc-check.done {
+        background: var(--green);
+        border-color: var(--green);
+      }
+
+      .trace-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 1.25rem;
+      }
+      .trace-step {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        padding: 0.9rem 1rem;
+        border-radius: 10px;
+        transition: all 0.35s;
+        opacity: 0.35;
+        border: 1.5px solid transparent;
+      }
+      .trace-step.active {
+        opacity: 1;
+        background: var(--bg2);
+        border-color: var(--accent);
+        box-shadow: 3px 3px 0 var(--accent);
+      }
+      .trace-step.done {
+        opacity: 0.7;
+      }
+      .trace-step-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        background: var(--bg3);
+        border: 2px solid var(--border);
+        transition: all 0.3s;
+      }
+      .trace-step.active .trace-step-icon {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+      .trace-step.done .trace-step-icon {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+      }
+      .trace-step-body {
+        flex: 1;
+      }
+      .trace-step-label {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.88rem;
+        color: var(--text);
+        margin-bottom: 0.2rem;
+      }
+      .trace-step-detail {
+        font-size: 0.83rem;
+        color: var(--text3);
+        font-weight: 600;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .trace-step.active .trace-step-label {
+        color: var(--accent);
+      }
+      .trace-connector {
+        width: 2px;
+        height: 14px;
+        background: var(--border);
+        margin-left: calc(1rem + 17px);
+      }
+      .trace-controls {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .trace-btn {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 0.55rem 1.25rem;
+        border-radius: 10px;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.88rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+      }
+      .trace-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.25);
+      }
+      .trace-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .trace-btn.secondary {
+        background: var(--bg2);
+        color: var(--text2);
+        border: 1.5px solid var(--border);
+        box-shadow: none;
+      }
+      .trace-output {
+        background: var(--code-bg);
+        border-radius: 10px;
+        padding: 0.9rem 1.1rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88rem;
+        min-height: 50px;
+        border: 1.5px solid #333;
+        margin-bottom: 1rem;
+        transition: all 0.3s;
+      }
+      .trace-out-line {
+        color: #2ecc71;
+        margin: 1px 0;
+      }
+      .trace-out-empty {
+        color: #555;
+      }
+
+      /* ===== BASE CALL VIZ (ОНОВЛЕНО) ===== */
+      .base-viz {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        padding: 1.75rem;
+        margin: 2rem 0;
+        box-shadow: 6px 6px 0 var(--border);
+      }
+      .base-viz-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--text);
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .base-viz-desc {
+        color: var(--text3);
+        font-size: 0.88rem;
+        font-weight: 600;
+        margin-bottom: 1.2rem;
+      }
+
+      .viz-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+      @media (max-width: 650px) {
+        .viz-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .base-layer {
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        background: var(--bg2);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        transition: all 0.3s;
+        position: relative;
+      }
+      .base-layer.active-layer {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.15);
+      }
+      .base-layer.disabled-layer {
+        opacity: 0.5;
+        border-style: dashed;
+        background: transparent;
+      }
+      .base-layer-name {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .base-line {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        color: var(--text2);
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        position: relative;
+        transition: all 0.3s;
+      }
+      .base-line.hl {
+        border-color: var(--green);
+        background: rgba(39, 174, 96, 0.05);
+        color: var(--text);
+      }
+      .base-line.locked {
+        border-color: var(--accent);
+        background: rgba(192, 57, 43, 0.05);
+        color: var(--text3);
+        opacity: 0.8;
+      }
+
+      .viz-badge {
+        font-family: "Nunito", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        width: max-content;
+        letter-spacing: 0.03em;
+      }
+      .badge-ok {
+        background: var(--green);
+        color: white;
+      }
+      .badge-redirect {
+        background: var(--orange);
+        color: white;
+        animation: pulse 2s infinite;
+      }
+      .badge-lock {
+        background: var(--accent);
+        color: white;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.03);
+        }
+      }
+
+      .cast-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      @media (max-width: 600px) {
+        .cast-controls {
+          grid-template-columns: 1fr;
+        }
+      }
+      .cast-select-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+      .cast-label {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text3);
+      }
+      .cast-select {
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 0.55rem 0.85rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88rem;
+        color: var(--text);
+        cursor: pointer;
+        outline: none;
+        transition: border 0.2s;
+      }
+      .cast-select:focus {
+        border-color: var(--accent);
+      }
+      .cast-run-btn {
+        align-self: flex-end;
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.25rem;
+        border-radius: 10px;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+        height: 42px;
+      }
+      .cast-result {
+        background: var(--code-bg);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88rem;
+        border: 1.5px solid #333;
+        min-height: 60px;
+      }
+      .cast-ok {
+        color: #2ecc71;
+      }
+      .cast-err {
+        color: #e74c3c;
+      }
+      .cast-warn {
+        color: #e67e22;
+      }
+
+      .flash-card-wrap {
+        perspective: 1000px;
+        margin-bottom: 1.2rem;
+      }
+      .flash-card {
+        position: relative;
+        height: 160px;
+        transform-style: preserve-3d;
+        transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        border-radius: 14px;
+      }
+      .flash-card.flipped {
+        transform: rotateY(180deg);
+      }
+      .flash-front,
+      .flash-back {
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        backface-visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        text-align: center;
+        font-weight: 700;
+        border: 2px solid var(--border);
+        box-shadow: 4px 4px 0 var(--border);
+      }
+      .flash-front {
+        background: var(--bg2);
+        color: var(--text);
+        font-size: 1.1rem;
+        font-family: "Syne", sans-serif;
+      }
+      .flash-back {
+        background: var(--accent);
+        color: white;
+        font-size: 0.92rem;
+        transform: rotateY(180deg);
+        font-family: "Nunito", sans-serif;
+        line-height: 1.6;
+      }
+      .flash-hint {
+        text-align: center;
+        font-size: 0.78rem;
+        color: var(--text3);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+      }
+      .flash-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .flash-nav-btn {
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 0.85rem;
+        cursor: pointer;
+        color: var(--text2);
+        transition: all 0.2s;
+      }
+      .flash-nav-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .flash-counter {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        color: var(--text3);
+        font-weight: 700;
+      }
+
+      .sort-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-height: 60px;
+      }
+      .sort-item {
+        background: var(--bg2);
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        cursor: grab;
+        font-weight: 700;
+        color: var(--text);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        user-select: none;
+        transition: all 0.2s;
+      }
+      .sort-item:active {
+        cursor: grabbing;
+      }
+      .sort-item.dragging {
+        opacity: 0.4;
+        border-style: dashed;
+      }
+      .sort-item.drag-over {
+        border-color: var(--accent);
+        background: var(--highlight);
+      }
+      .sort-handle {
+        color: var(--text3);
+        font-size: 1.1rem;
+      }
+      .sort-check-btn {
+        background: var(--green);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 10px;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        cursor: pointer;
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+      }
+      .sort-check-btn:hover {
+        transform: translateY(-1px);
+      }
+      .sort-result {
+        margin-top: 0.75rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: none;
+      }
+      .sort-result.show {
+        display: block;
+        animation: fadeInUp 0.3s ease;
+      }
+
+      /* ===== DYNAMIC DISPATCH VISUALIZER WIDGET FOR SECTION 4 ===== */
+      .dyn-viz-container {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        margin: 1.5rem 0;
+        overflow: hidden;
+        box-shadow: 6px 6px 0 var(--border);
+      }
+      .dyn-viz-header {
+        display: flex;
+        background: var(--bg2);
+        border-bottom: 2px solid var(--border);
+        overflow-x: auto;
+      }
+      .dyn-viz-tab {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text2);
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+        white-space: nowrap;
+        user-select: none;
+      }
+      .dyn-viz-tab:hover {
+        background: var(--bg3);
+      }
+      .dyn-viz-tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+        background: var(--surface);
+      }
+      .dyn-viz-body {
+        padding: 1.5rem;
+        display: none;
+        gap: 1.5rem;
+        grid-template-columns: 1.2fr 1fr;
+        align-items: start;
+      }
+      .dyn-viz-body.active {
+        display: grid;
+        animation: fadeInUp 0.4s ease;
+      }
+      @media (max-width: 768px) {
+        .dyn-viz-body.active {
+          grid-template-columns: 1fr;
+        }
+      }
+      .dyn-code-area {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .dyn-visual-area {
+        background: var(--bg2);
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .dyn-box-outer {
+        border: 3px solid;
+        border-radius: 12px;
+        padding: 1.5rem 1rem 1rem;
+        width: 100%;
+        max-width: 280px;
+        position: relative;
+        background: var(--surface);
+        text-align: center;
+        transition: all 0.3s;
+      }
+      .dyn-outer-label {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg2);
+        padding: 0.1rem 0.6rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-radius: 6px;
+        border: 2px solid;
+        white-space: nowrap;
+      }
+      .dyn-obj-inner {
+        font-size: 4rem;
+        margin: 0.5rem 0;
+        animation: floatObj 3s ease-in-out infinite;
+        display: inline-block;
+      }
+      @keyframes floatObj {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      .dyn-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+        width: 100%;
+        text-align: left;
+      }
+      .dyn-method-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 2px solid;
+        padding: 0.6rem 1rem;
+        border-radius: 10px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        font-weight: 700;
+        transition: all 0.3s;
+      }
+      .dyn-method-row.available {
+        border-color: rgba(39, 174, 96, 0.4);
+        background: rgba(39, 174, 96, 0.1);
+        color: var(--green);
+      }
+      .dyn-method-row.active-call {
+        border-color: var(--green);
+        background: var(--green);
+        color: white;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+        transform: scale(1.03);
+        z-index: 2;
+      }
+      .dyn-method-row.unavailable {
+        border-color: rgba(192, 57, 43, 0.4);
+        background: rgba(192, 57, 43, 0.1);
+        color: var(--accent);
+      }
+      .dyn-method-row span small {
+        font-family: "Nunito", sans-serif;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.4rem;
+      }
+      .dyn-method-row.active-call span small {
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .dyn-method-icon {
+        font-size: 1.1rem;
+      }
+
+      .dyn-desc-text {
+        font-size: 0.95rem;
+        color: var(--text2);
+        text-align: center;
+        margin-top: 1.25rem;
+        font-weight: 600;
+        line-height: 1.6;
+      }
+
+      /* ===== ОСТАТОЧНЕ ВИРІВНЮВАННЯ ДЛЯ ВСІХ ВАРІАНТІВ CODE-TABLE ===== */
+
+      /* 1. Робимо гнучкими контейнерами УСІ колонки сітки (і ліві, і праві) */
+      .code-table > div {
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* 2. Прибираємо зайві зовнішні відступи, які можуть ламати вирівнювання */
+      .code-table > div > :first-child {
+        margin-top: 0 !important;
+      }
+      .code-table > div > :last-child {
+        margin-bottom: 0 !important;
+      }
+
+      /* 3. Змушуємо сам блок з кодом розтягуватися по висоті. 
+   Це автоматично вирівняє нижні краї коду і виштовхне блоки виводу на один рівень! */
+      .code-table .code-block {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      }
+
+      /* 4. Темний фон коду заповнює весь розтягнутий простір */
+      .code-table .code-body {
+        flex-grow: 1;
+      }
+
+      /* 5. Блок з описом залишаємо як звичайний текстовий блок, щоб він не розривався */
+      .code-table-desc {
+        display: block !important;
+      }
+
+      /* ===== АДАПТИВНІСТЬ ПЕРЕМИКАЧА ТЕМИ (МОБІЛЬНІ - ТІЛЬКИ СМАЙЛИ) ===== */
+      @media (max-width: 600px) {
+        .site-header {
+          padding: 0.75rem 1rem; /* Трохи менші відступи по боках для шапки */
+        }
+
+        /* Ховаємо текст всередині кнопок */
+        .theme-text {
+          display: none;
+        }
+
+        /* Робимо кнопки компактними, залишаючи лише смайлик */
+        .theme-btn {
+          padding: 0.35rem 0.6rem;
+          font-size: 1.1rem; /* Трохи збільшуємо сам смайлик */
+        }
+      }
+    </style>
+  </head>
+  <body data-theme="system">
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- HEADER -->
+    <header class="site-header">
+      <a class="header-brand" href="#">C<span># </span>OOP 🚀</a>
+      <div class="theme-switcher">
+        <button class="theme-btn" data-t="light" onclick="setTheme('light')">
+          ☀️ <span class="theme-text">Світла</span>
+        </button>
+        <button
+          class="theme-btn active"
+          data-t="system"
+          onclick="setTheme('system')"
+        >
+          ⚙️ <span class="theme-text">Системна</span>
+        </button>
+        <button class="theme-btn" data-t="dark" onclick="setTheme('dark')">
+          🌙 <span class="theme-text">Темна</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-wrapper">
+      <!-- HERO -->
+      <div class="hero fade-in">
+        <div class="hero-decoration">🐋</div>
+        <div class="hero-badge">📚 Лекція №23-25</div>
+        <h1>Полі<span class="accent">мор</span>фізм</h1>
+        <p class="hero-desc">
+          Найпотужніший інструмент ООП — розберемо складний принцип просто і з
+          купою прикладів 🐋🐄
+        </p>
+      </div>
+
+      <!-- DIALOGUE INTRO -->
+      <div class="dialogue-container fade-in">
+        <div class="dialogue-header">
+          <div class="dialogue-dot dot-red"></div>
+          <div class="dialogue-dot dot-yellow"></div>
+          <div class="dialogue-dot dot-green"></div>
+          <span style="margin-left: 0.5rem"
+            >Розмова викладача з роботом-учнем</span
+          >
+        </div>
+        <div class="dialogue-body">
+          <div class="message">
+            <div class="avatar avatar-teacher">👨‍🏫</div>
+            <div class="bubble teacher">
+              <div class="speaker-name name-teacher">Викладач</div>
+              — Аміго, ти любиш китів?
+            </div>
+          </div>
+          <div class="message">
+            <div class="avatar avatar-student">🤖</div>
+            <div class="bubble student">
+              <div class="speaker-name name-student">Аміго</div>
+              — Китів? Ні, не чув.
+            </div>
+          </div>
+          <div class="message">
+            <div class="avatar avatar-teacher">👨‍🏫</div>
+            <div class="bubble teacher">
+              <div class="speaker-name name-teacher">Викладач</div>
+              — Це як корова, тільки більша і плаває. До речі, кити походять від
+              корів. Ну, або мали з ними спільного предка. Не так важливо.
+            </div>
+          </div>
+          <div class="message">
+            <div class="avatar avatar-teacher">👨‍🏫</div>
+            <div class="bubble teacher">
+              <div class="speaker-name name-teacher">Викладач</div>
+              — Отже. Хочу розповісти тобі ще про один дуже потужний інструмент
+              ООП — це <strong>поліморфізм</strong>. У нього є особливості.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLE OF CONTENTS -->
+      <nav class="toc-nav fade-in">
+        <div class="toc-label">📑 Зміст лекції</div>
+        <div class="toc-list">
+          <a href="#sec1" class="toc-item"
+            ><div class="toc-num">1</div>
+            Перевизначення методу
+            <div class="toc-check" id="check-sec1"></div
+          ></a>
+          <a href="#sec2" class="toc-item"
+            ><div class="toc-num">2</div>
+            А це ще не все (PrintAll)
+            <div class="toc-check" id="check-sec2"></div
+          ></a>
+          <a href="#sec3" class="toc-item"
+            ><div class="toc-num">3</div>
+            Приведення типів
+            <div class="toc-check" id="check-sec3"></div
+          ></a>
+          <a href="#sec4" class="toc-item"
+            ><div class="toc-num">4</div>
+            Динамічна диспетчеризація
+            <div class="toc-check" id="check-sec4"></div
+          ></a>
+          <a href="#sec5" class="toc-item"
+            ><div class="toc-num">5</div>
+            Розширення та звуження
+            <div class="toc-check" id="check-sec5"></div
+          ></a>
+          <a href="#sec6" class="toc-item"
+            ><div class="toc-num">6</div>
+            Виклик оригінального методу
+            <div class="toc-check" id="check-sec6"></div
+          ></a>
+        </div>
+      </nav>
+
+      <!-- SECTION 1 -->
+      <div class="section" id="sec1">
+        <h2 class="section-title">
+          <div class="section-num">1</div>
+          Перевизначення методу 🔄
+        </h2>
+
+        <p class="prose">
+          Уяви, що ти для гри написав клас <strong>«Корова»</strong>. У ньому є
+          багато полів і методів. Об'єкти цього класу можуть робити різні речі:
+          йти, їсти, спати. Ще корови дзвонять у дзвіночок, коли ходять.
+          Припустимо, ти реалізував у класі все до дрібниць.
+        </p>
+
+        <div class="mega-note">
+          <div class="mega-note-icon">🎮</div>
+          <div class="mega-note-text">
+            <strong>Уяви:</strong> у тебе є повноцінний клас <code>Cow</code> з
+            усіма методами — ходити, їсти, мукати і навіть дзвонити у дзвіночок!
+          </div>
+        </div>
+
+        <p class="prose">
+          А тут приходить замовник проєкту і каже, що хоче випустити новий
+          рівень гри, де всі дії відбуваються в морі, а головним героєм буде
+          кит.
+        </p>
+
+        <p class="prose">
+          Ти почав проєктувати клас <strong>«Кит»</strong> і зрозумів, що він
+          лише трохи відрізняється від класу «Корова». Логіка роботи обох класів
+          дуже схожа, і ти вирішив використати <strong>успадкування</strong>.
+        </p>
+
+        <p class="prose">
+          Клас «Корова» ідеально підходить на роль класу-батька, там є всі
+          необхідні змінні та методи. Досить лише додати киту можливість
+          плавати. Але є проблема: у твого кита є ноги, роги і дзвіночок. Адже
+          ця функціональність реалізована всередині класу «Корова». Що тут можна
+          зробити?
+        </p>
+
+        <div class="info-card tip">
+          <div class="card-label">💡 Рятівник</div>
+          До нас на допомогу приходить
+          <strong>перевизначення (заміна) методів</strong>. Якщо ми успадкували
+          метод, який робить не зовсім те, що потрібно нам у нашому новому
+          класі, ми можемо замінити цей метод на інший.
+        </div>
+
+        <p class="prose">
+          Як же це робиться? У нашому класі-нащадку ми оголошуємо
+          <strong
+            >такий самий метод, як і метод класу-батька, який хочемо
+            змінити.</strong
+          >
+          Пишемо в ньому новий код. І все — ніби старого методу в класі-батьку й
+          не було.
+        </p>
+        <p class="prose">Ось як це працює:</p>
+
+        <div class="code-table">
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">C# — Визначення класів</span>
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">class</span> <span class="cls">Cow</span>
+{
+    <span class="kw">public virtual void</span> <span class="fn">PrintColor</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — біла"</span>);
+    }
+
+    <span class="kw">public virtual void</span> <span class="fn">PrintName</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — корова"</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="cls">Whale</span> : <span class="cls">Cow</span>
+{
+    <span class="kw">public override void</span> <span class="fn">PrintName</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — кит"</span>);
+    }
+}</pre>
+              </div>
+            </div>
+          </div>
+          <div class="code-table-desc">
+            Тут визначено два класи: <code>Cow</code> та
+            <code>Whale</code>.<br /><br />
+            <code>Whale</code> успадкований від <code>Cow</code>.<br /><br />
+            У класі <code>Whale</code> перевизначено метод
+            <code>PrintName()</code> за допомогою ключового слова
+            <code><strong>override</strong></code
+            >.
+          </div>
+        </div>
+
+        <div class="info-card info">
+          <div class="card-label">🔷 Важливо для C#</div>
+          У C# метод батьківського класу, що буде перевизначено, потрібно
+          позначити ключовим словом <strong><code>virtual</code></strong
+          >, а перевизначений метод у похідному класі — словом
+          <strong><code>override</code></strong
+          >. Без <code>virtual</code> метод не можна перевизначити!
+        </div>
+
+        <div class="code-table">
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">C# — Виклик методу корови</span>
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">static void</span> <span class="fn">Main</span>(<span class="kw">string</span>[] args)
+{
+    <span class="cls">Cow</span> cow = <span class="kw">new</span> <span class="cls">Cow</span>();
+    cow.<span class="fn">PrintName</span>();
+}</pre>
+              </div>
+            </div>
+            <div class="output-label">📟 Виведе на екран:</div>
+            <div class="output-box">Я — корова</div>
+          </div>
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">C# — Виклик методу кита</span>
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">static void</span> <span class="fn">Main</span>(<span class="kw">string</span>[] args)
+{
+    <span class="cls">Whale</span> whale = <span class="kw">new</span> <span class="cls">Whale</span>();
+    whale.<span class="fn">PrintName</span>();
+}</pre>
+              </div>
+            </div>
+            <div class="output-label">📟 Виведе на екран:</div>
+            <div class="output-box">Я — кит</div>
+          </div>
+        </div>
+
+        <p class="prose">
+          Після успадкування класу <code>Cow</code> та перевизначення методу
+          <code>PrintName</code>, клас <code>Whale</code> фактично містить такі
+          дані та методи:
+        </p>
+
+        <div class="code-table">
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">C# — Ефективний вигляд Whale</span>
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">class</span> <span class="cls">Whale</span>
+{
+    <span class="kw">public void</span> <span class="fn">PrintColor</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — біла"</span>);
+    }
+
+    <span class="kw">public void</span> <span class="fn">PrintName</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — кит"</span>);
+    }
+}</pre>
+              </div>
+            </div>
+          </div>
+          <div class="code-table-desc">
+            Про жодний старий метод ми й не знаємо. 😊<br /><br />
+            Ось так виглядає клас <code>Whale</code> після застосування
+            успадкування та перевизначення методу. Старого
+            <code>PrintName</code> з «Корова» немає й сліду!
+          </div>
+        </div>
+
+        <div class="dialogue-container">
+          <div class="dialogue-body">
+            <div class="message">
+              <div class="avatar avatar-student">🤖</div>
+              <div class="bubble student">
+                <div class="speaker-name name-student">Аміго</div>
+                — Чесно кажучи, очікувано.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SECTION 2 -->
+      <div class="section" id="sec2">
+        <h2 class="section-title">
+          <div class="section-num">2</div>
+          Але це ще не все! 🎯
+        </h2>
+
+        <div class="dialogue-container">
+          <div class="dialogue-body">
+            <div class="message">
+              <div class="avatar avatar-teacher">👨‍🏫</div>
+              <div class="bubble teacher">
+                <div class="speaker-name name-teacher">Викладач</div>
+                — Припустимо, у класі <code>Cow</code> є метод
+                <code>PrintAll</code>, який викликає два інших методи. Тоді код
+                буде працювати ось так:
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-table">
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang"
+                  >C# — PrintAll викликає інші методи</span
+                >
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">class</span> <span class="cls">Cow</span>
+{
+    <span class="kw">public virtual void</span> <span class="fn">PrintAll</span>()
+    {
+        <span class="fn">PrintColor</span>();
+        <span class="fn">PrintName</span>();
+    }
+
+    <span class="kw">public virtual void</span> <span class="fn">PrintColor</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — біла"</span>);
+    }
+
+    <span class="kw">public virtual void</span> <span class="fn">PrintName</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — корова"</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="cls">Whale</span> : <span class="cls">Cow</span>
+{
+    <span class="kw">public override void</span> <span class="fn">PrintName</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — кит"</span>);
+    }
+}</pre>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">C# — Main з PrintAll</span>
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">static void</span> <span class="fn">Main</span>(<span class="kw">string</span>[] args)
+{
+    <span class="cls">Whale</span> whale = <span class="kw">new</span> <span class="cls">Whale</span>();
+    whale.<span class="fn">PrintAll</span>();
+}</pre>
+              </div>
+            </div>
+            <div class="output-label">📟 Виведе на екран:</div>
+            <div class="output-box">Я — біла<br />Я — кит</div>
+          </div>
+        </div>
+
+        <div class="info-card important">
+          <div class="card-label">⚠️ Зверни увагу!</div>
+          Коли викликається метод <code>PrintAll()</code>, написаний у класі
+          <code>Cow</code>, у об'єкта типу <code>Whale</code> — буде використано
+          метод <code>PrintName</code> класу <code>Whale</code>, а не
+          <code>Cow</code>.<br /><br />
+          Головне —
+          <strong
+            >не в якому класі написаний метод, а який тип (клас) об'єкта</strong
+          >, у якого цей метод викликано.
+        </div>
+
+        <!-- TRACER WIDGET -->
+        <div class="trace-box">
+          <div class="trace-title">👣 Покроковий Трейсер Коду</div>
+          <div class="trace-desc">
+            Давай подивимось, як виконується код
+            <code>whale.PrintAll()</code> крок за кроком! Натискай кнопку:
+          </div>
+
+          <div class="trace-output" id="tracerOut">
+            <div class="trace-out-empty">// Тут з'явиться вивід консолі...</div>
+          </div>
+
+          <div class="trace-steps">
+            <div class="trace-step active" id="ts1">
+              <div class="trace-step-icon">1</div>
+              <div class="trace-step-body">
+                <div class="trace-step-label">
+                  Виклик <code>whale.PrintAll()</code>
+                </div>
+                <div class="trace-step-detail">
+                  Йдемо у батьківський клас <code>Cow</code>, оскільки
+                  <code>Whale</code> його не перевизначив.
+                </div>
+              </div>
+            </div>
+            <div class="trace-connector"></div>
+            <div class="trace-step" id="ts2">
+              <div class="trace-step-icon">2</div>
+              <div class="trace-step-body">
+                <div class="trace-step-label">
+                  Усередині <code>PrintAll()</code>
+                </div>
+                <div class="trace-step-detail">
+                  Виконується рядок <code>PrintColor();</code>
+                </div>
+              </div>
+            </div>
+            <div class="trace-connector"></div>
+            <div class="trace-step" id="ts3">
+              <div class="trace-step-icon">3</div>
+              <div class="trace-step-body">
+                <div class="trace-step-label">
+                  Виклик <code>PrintColor()</code>
+                </div>
+                <div class="trace-step-detail">
+                  Метод береться з <code>Cow</code>. Виводиться "Я — біла".
+                </div>
+              </div>
+            </div>
+            <div class="trace-connector"></div>
+            <div class="trace-step" id="ts4">
+              <div class="trace-step-icon">4</div>
+              <div class="trace-step-body">
+                <div class="trace-step-label">
+                  Усередині <code>PrintAll()</code>
+                </div>
+                <div class="trace-step-detail">
+                  Наступний рядок <code>PrintName();</code>
+                </div>
+              </div>
+            </div>
+            <div class="trace-connector"></div>
+            <div class="trace-step" id="ts5">
+              <div class="trace-step-icon">✨</div>
+              <div class="trace-step-body">
+                <div class="trace-step-label">
+                  Магія Поліморфізму! <code>PrintName()</code>
+                </div>
+                <div class="trace-step-detail">
+                  Хоча ми зараз у класі <code>Cow</code>, наш об'єкт — це
+                  <code>Whale</code>! Викликається перевизначений метод з
+                  <code>Whale</code>. Виводиться "Я — кит".
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trace-controls">
+            <button class="trace-btn" id="btnNextTrace" onclick="nextTrace()">
+              Наступний крок
+            </button>
+            <button
+              class="trace-btn secondary"
+              id="btnResetTrace"
+              onclick="resetTrace()"
+              style="display: none"
+            >
+              Почати спочатку
+            </button>
+          </div>
+        </div>
+
+        <div class="dialogue-container">
+          <div class="dialogue-body">
+            <div class="message">
+              <div class="avatar avatar-student">🤖</div>
+              <div class="bubble student">
+                <div class="speaker-name name-student">Аміго</div>
+                — Зрозуміло.
+              </div>
+            </div>
+            <div class="message">
+              <div class="avatar avatar-teacher">👨‍🏫</div>
+              <div class="bubble teacher">
+                <div class="speaker-name name-teacher">Викладач</div>
+                — Успадковувати та перевизначати можна лише нестатичні методи.
+                Статичні методи не успадковуються і, відповідно, не
+                перевизначаються.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="prose">
+          Ось як виглядає клас <code>Whale</code> після застосування
+          успадкування та перевизначення методів:
+        </p>
+
+        <div class="code-table">
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">C# — Повний вигляд Whale</span>
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">class</span> <span class="cls">Whale</span>
+{
+    <span class="kw">public void</span> <span class="fn">PrintAll</span>()
+    {
+        <span class="fn">PrintColor</span>();
+        <span class="fn">PrintName</span>();
+    }
+
+    <span class="kw">public void</span> <span class="fn">PrintColor</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — біла"</span>);
+    }
+
+    <span class="kw">public void</span> <span class="fn">PrintName</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — кит"</span>);
+    }
+}</pre>
+              </div>
+            </div>
+          </div>
+          <div class="code-table-desc">
+            Ось як виглядає клас <code>Whale</code> після застосування
+            успадкування та перевизначення методу.<br /><br />
+            Про жодний старий метод <code>PrintName</code> ми й не знаємо. 🐋
+          </div>
+        </div>
+
+        <!-- QUIZ FOR SECTION 2 -->
+        <div class="quiz-section">
+          <div class="quiz-title">🧩 Перевір себе!</div>
+          <div class="quiz-question">
+            У класі <code>Cow</code> метод <code>PrintAll()</code> викликає
+            <code>PrintName()</code>. Клас <code>Whale</code> перевизначає
+            <code>PrintName()</code>. Якщо викликати <code>PrintAll()</code> для
+            об'єкта <code>Whale</code>, чия реалізація
+            <code>PrintName()</code> виконається?
+          </div>
+          <div class="quiz-options" id="q-sec2">
+            <div class="quiz-option" onclick="answer(this, 'q-sec2', 'wrong')">
+              <div class="option-letter">A</div>
+              З класу Cow (бо PrintAll написаний там)
+            </div>
+            <div
+              class="quiz-option"
+              onclick="answer(this, 'q-sec2', 'correct')"
+            >
+              <div class="option-letter">B</div>
+              З класу Whale (бо об'єкт є китом)
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q-sec2', 'wrong')">
+              <div class="option-letter">C</div>
+              Обидві реалізації по черзі
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q-sec2', 'wrong')">
+              <div class="option-letter">D</div>
+              Виникне помилка компіляції
+            </div>
+          </div>
+          <div class="quiz-feedback" id="q-sec2-fb"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SECTION 3 -->
+      <div class="section" id="sec3">
+        <h2 class="section-title">
+          <div class="section-num">3</div>
+          Приведення типів 🔀
+        </h2>
+
+        <div class="dialogue-container">
+          <div class="dialogue-body">
+            <div class="message">
+              <div class="avatar avatar-teacher">👨‍🏫</div>
+              <div class="bubble teacher">
+                <div class="speaker-name name-teacher">Викладач</div>
+                — Перш ніж іти далі, давай згадаємо, як працює перетворення
+                базових типів. Пам'ятаєш, як ми клали <code>int</code> у
+                <code>double</code> і навпаки?
+              </div>
+            </div>
+            <div class="message">
+              <div class="avatar avatar-student">🤖</div>
+              <div class="bubble student">
+                <div class="speaker-name name-student">Аміго</div>
+                — Здається, так. Там щось про втрату даних і дужки...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="prose">
+          Давай освіжимо це в пам'яті. У програмуванні існують поняття
+          <strong>розширення (Upcasting)</strong> та
+          <strong>звуження (Downcasting)</strong> типів. Вони потрібні для того,
+          щоб ми могли гнучко і, головне, безпечно працювати з пам'яттю
+          комп'ютера.
+        </p>
+
+        <table class="compare-table" style="margin-bottom: 2rem">
+          <thead>
+            <tr>
+              <th>Примітивні типи</th>
+              <th>Приклад та пояснення</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>Upcasting (Розширення)</strong><br />
+                <span style="font-size: 0.85rem; color: var(--text3)"
+                  >Безпечне перетворення</span
+                >
+              </td>
+              <td>
+                <div
+                  class="code-block"
+                  style="margin: 0.5rem 0; box-shadow: none"
+                >
+                  <div class="code-body">
+                    <pre
+                      style="font-size: 0.8rem"
+                    ><span class="kw">int</span> a = <span class="num">5</span>;
+<span class="kw">double</span> b = a; <span class="cmt">// Неявне перетворення</span></pre>
+                  </div>
+                </div>
+                Маленька "коробка" (<code>int</code>) легко і гарантовано
+                поміщається у велику (<code>double</code>). Дані не втрачаються
+                (число 5 безпечно стає 5.0). Тому компілятор робить це сам,
+                неявно.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Downcasting (Звуження)</strong><br />
+                <span style="font-size: 0.85rem; color: var(--text3)"
+                  >Потребує явного підтвердження</span
+                >
+              </td>
+              <td>
+                <div
+                  class="code-block"
+                  style="margin: 0.5rem 0; box-shadow: none"
+                >
+                  <div class="code-body">
+                    <pre
+                      style="font-size: 0.8rem"
+                    ><span class="kw">double</span> x = <span class="num">5.99</span>;
+<span class="kw">int</span> y = (<span class="kw">int</span>)x; <span class="cmt">// Явне перетворення!</span></pre>
+                  </div>
+                </div>
+                Велика "коробка" не влазить у маленьку. Є ризик втрати даних
+                (дробова частина <code>.99</code> відкинеться, і
+                <code>y</code> стане просто <code>5</code>). Тому компілятор
+                змушує нас написати <code>(int)</code>, щоб ми взяли
+                відповідальність за можливу втрату даних на себе.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="mega-note">
+          <div class="mega-note-icon">✨</div>
+          <div class="mega-note-text">
+            <strong>А тепер головна новина:</strong> з об'єктами (класами) все
+            працює абсолютно за тим самим принципом!
+          </div>
+        </div>
+
+        <p class="prose">
+          Тут є цікавий момент. Оскільки клас при успадкуванні отримує всі
+          методи та дані класу-батька, то об'єкт цього класу дозволяється
+          зберігати (присвоювати) у змінні класу-батька (і батька батька, і так
+          далі, аж до <code>object</code>). Приклад:
+        </p>
+
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Код</th>
+              <th>Опис</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="code-block" style="margin: 0; box-shadow: none">
+                  <div class="code-body">
+                    <pre
+                      style="font-size: 0.82rem"
+                    ><span class="kw">static void</span> <span class="fn">Main</span>(...)
+{
+    <span class="cls">Whale</span> whale = <span class="kw">new</span> <span class="cls">Whale</span>();
+    whale.<span class="fn">PrintColor</span>();
+}</pre>
+                  </div>
+                </div>
+              </td>
+              <td>
+                На екран виведеться:<br />
+                <div class="output-box" style="margin: 0.5rem 0">Я — біла</div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="code-block" style="margin: 0; box-shadow: none">
+                  <div class="code-body">
+                    <pre
+                      style="font-size: 0.82rem"
+                    ><span class="kw">static void</span> <span class="fn">Main</span>(...)
+{
+    <span class="cls">Cow</span> cow = <span class="kw">new</span> <span class="cls">Whale</span>();
+    cow.<span class="fn">PrintColor</span>();
+}</pre>
+                  </div>
+                </div>
+              </td>
+              <td>
+                На екран виведеться:<br />
+                <div class="output-box" style="margin: 0.5rem 0">Я — біла</div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="code-block" style="margin: 0; box-shadow: none">
+                  <div class="code-body">
+                    <pre
+                      style="font-size: 0.82rem"
+                    ><span class="kw">static void</span> <span class="fn">Main</span>(...)
+{
+    <span class="cls">object</span> o = <span class="kw">new</span> <span class="cls">Whale</span>();
+    Console.<span class="fn">WriteLine</span>(o.<span class="fn">ToString</span>());
+}</pre>
+                  </div>
+                </div>
+              </td>
+              <td>
+                На екран виведеться щось на кшталт:<br />
+                <div class="output-box" style="margin: 0.5rem 0">Whale</div>
+                Метод <code>ToString()</code> успадкований від класу
+                <code>object</code>.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="dialogue-container">
+          <div class="dialogue-body">
+            <div class="message">
+              <div class="avatar avatar-student">🤖</div>
+              <div class="bubble student">
+                <div class="speaker-name name-student">Аміго</div>
+                — Дуже цікаво. А навіщо це може знадобитися?
+              </div>
+            </div>
+            <div class="message">
+              <div class="avatar avatar-teacher">👨‍🏫</div>
+              <div class="bubble teacher">
+                <div class="speaker-name name-teacher">Викладач</div>
+                — Це цінна властивість. Пізніше ти зрозумієш, що дуже, дуже
+                цінна.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SECTION 4 -->
+      <div class="section" id="sec4">
+        <h2 class="section-title">
+          <div class="section-num">4</div>
+          Виклик методу об'єкта<br /><small
+            style="font-size: 0.9rem; font-weight: 600; color: var(--text3)"
+            >(динамічна диспетчеризація методів)</small
+          >
+          ⚡
+        </h2>
+
+        <p class="prose">Ось як це виглядає:</p>
+
+        <p class="prose">
+          Щоб глибше зрозуміти цей механізм, давай уявимо, що ми додали в клас
+          <code>Whale</code> абсолютно новий метод —
+          <strong><code>Swim()</code> (Плавати)</strong>. Цього методу немає у
+          класі <code>Cow</code>. Подивимось, що буде доступно для виклику
+          залежно від типу змінної:
+        </p>
+
+        <!-- DYNAMIC DISPATCH VISUALIZER -->
+        <div class="dyn-viz-container">
+          <div class="dyn-viz-header">
+            <div class="dyn-viz-tab active" onclick="openDynTab(1, this)">
+              1. Змінна Whale
+            </div>
+            <div class="dyn-viz-tab" onclick="openDynTab(2, this)">
+              2. Змінна Cow (Поліморфізм!)
+            </div>
+            <div class="dyn-viz-tab" onclick="openDynTab(3, this)">
+              3. Звичайна Корова
+            </div>
+          </div>
+
+          <!-- TAB 1: Whale -> Whale -->
+          <div class="dyn-viz-body active" id="dyn-tab-1">
+            <div class="dyn-code-area">
+              <div class="code-block" style="margin: 0; box-shadow: none">
+                <div class="code-body">
+                  <pre
+                    style="font-size: 0.82rem"
+                  ><span class="kw">static void</span> <span class="fn">Main</span>(...)
+{
+    <span class="cls">Whale</span> whale = <span class="kw">new</span> <span class="cls">Whale</span>();
+    whale.<span class="fn">PrintName</span>();
+    whale.<span class="fn">Swim</span>(); <span class="cmt">// Працює!</span>
+}</pre>
+                </div>
+              </div>
+              <div>
+                <div class="output-label">НА ЕКРАН ВИВЕДЕТЬСЯ:</div>
+                <div class="output-box" style="margin: 0">
+                  Я — кит.<br />Я пливу!
+                </div>
+              </div>
+            </div>
+            <div class="dyn-visual-area">
+              <div class="dyn-box-outer" style="border-color: var(--accent)">
+                <div
+                  class="dyn-outer-label"
+                  style="color: var(--accent); border-color: var(--accent)"
+                >
+                  Змінна: Whale
+                </div>
+                <div class="dyn-obj-inner">🐋</div>
+                <div
+                  style="
+                    font-size: 0.8rem;
+                    color: var(--text3);
+                    font-weight: 700;
+                  "
+                >
+                  Об'єкт: new Whale()
+                </div>
+              </div>
+              <div class="dyn-methods">
+                <div class="dyn-method-row available">
+                  <span>PrintColor() <small>— успадковано</small></span>
+                  <span class="dyn-method-icon">✓</span>
+                </div>
+                <div class="dyn-method-row active-call">
+                  <span>PrintName() <small>— викликається!</small></span>
+                  <span class="dyn-method-icon">✓</span>
+                </div>
+                <div class="dyn-method-row available">
+                  <span>Swim() <small>— власний метод</small></span>
+                  <span class="dyn-method-icon">✓</span>
+                </div>
+              </div>
+              <div class="dyn-desc-text">
+                Змінна і об'єкт одного типу. Відкрито повний доступ до всіх
+                методів класу Whale.
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: Cow -> Whale (Magic happens here) -->
+          <div class="dyn-viz-body" id="dyn-tab-2">
+            <div class="dyn-code-area">
+              <div class="code-block" style="margin: 0; box-shadow: none">
+                <div class="code-body">
+                  <pre
+                    style="font-size: 0.82rem"
+                  ><span class="kw">static void</span> <span class="fn">Main</span>(...)
+{
+    <span class="cls">Cow</span> cow = <span class="kw">new</span> <span class="cls">Whale</span>();
+    cow.<span class="fn">PrintName</span>();
+    
+    <span class="cmt">// cow.Swim(); </span>
+    <span class="cmt">// ❌ ПОМИЛКА! Cow не має методу Swim</span>
+}</pre>
+                </div>
+              </div>
+              <div>
+                <div class="output-label">НА ЕКРАН ВИВЕДЕТЬСЯ:</div>
+                <div class="output-box" style="margin: 0">Я — кит.</div>
+              </div>
+            </div>
+            <div class="dyn-visual-area">
+              <div class="dyn-box-outer" style="border-color: var(--blue)">
+                <div
+                  class="dyn-outer-label"
+                  style="color: var(--blue); border-color: var(--blue)"
+                >
+                  Змінна: Cow
+                </div>
+                <div class="dyn-obj-inner">🐋</div>
+                <div
+                  style="
+                    font-size: 0.8rem;
+                    color: var(--text3);
+                    font-weight: 700;
+                  "
+                >
+                  Об'єкт: new Whale()
+                </div>
+              </div>
+              <div class="dyn-methods">
+                <div class="dyn-method-row available">
+                  <span>PrintColor() <small>— доступно</small></span>
+                  <span class="dyn-method-icon">✓</span>
+                </div>
+                <div class="dyn-method-row active-call">
+                  <span>PrintName() <small>— викликає кита!</small></span>
+                  <span class="dyn-method-icon">✓</span>
+                </div>
+                <div class="dyn-method-row unavailable">
+                  <span>Swim() <small>— приховано типом змінної</small></span>
+                  <span class="dyn-method-icon">❌</span>
+                </div>
+              </div>
+              <div class="dyn-desc-text">
+                Хоча це кит, змінна "Cow" не знає про метод Swim(). Але метод
+                PrintName() завдяки віртуальності
+                <strong>спрацює саме китовий</strong>!
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: Cow -> Cow -->
+          <div class="dyn-viz-body" id="dyn-tab-3">
+            <div class="dyn-code-area">
+              <div class="code-block" style="margin: 0; box-shadow: none">
+                <div class="code-body">
+                  <pre
+                    style="font-size: 0.82rem"
+                  ><span class="kw">static void</span> <span class="fn">Main</span>(...)
+{
+    <span class="cls">Cow</span> cow = <span class="kw">new</span> <span class="cls">Cow</span>();
+    cow.<span class="fn">PrintName</span>();
+    
+    <span class="cmt">// cow.Swim(); </span>
+    <span class="cmt">// ❌ ПОМИЛКА! Корова не вміє плавати.</span>
+}</pre>
+                </div>
+              </div>
+              <div>
+                <div class="output-label">НА ЕКРАН ВИВЕДЕТЬСЯ:</div>
+                <div class="output-box" style="margin: 0">Я — корова</div>
+              </div>
+            </div>
+            <div class="dyn-visual-area">
+              <div class="dyn-box-outer" style="border-color: var(--blue)">
+                <div
+                  class="dyn-outer-label"
+                  style="color: var(--blue); border-color: var(--blue)"
+                >
+                  Змінна: Cow
+                </div>
+                <div class="dyn-obj-inner">🐄</div>
+                <div
+                  style="
+                    font-size: 0.8rem;
+                    color: var(--text3);
+                    font-weight: 700;
+                  "
+                >
+                  Об'єкт: new Cow()
+                </div>
+              </div>
+              <div class="dyn-methods">
+                <div class="dyn-method-row available">
+                  <span>PrintColor() <small>— доступно</small></span>
+                  <span class="dyn-method-icon">✓</span>
+                </div>
+                <div class="dyn-method-row active-call">
+                  <span>PrintName() <small>— викликається!</small></span>
+                  <span class="dyn-method-icon">✓</span>
+                </div>
+                <div class="dyn-method-row unavailable">
+                  <span>Swim() <small>— не існує у корови</small></span>
+                  <span class="dyn-method-icon">❌</span>
+                </div>
+              </div>
+              <div class="dyn-desc-text">
+                Змінна і об'єкт типу Cow. Викликається оригінальний метод класу
+                Cow.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ВІДРЕДАГОВАНИЙ БЛОК "ЗВЕРНИ УВАГУ!" -->
+        <div
+          class="info-card warning"
+          style="
+            border-width: 3px;
+            box-shadow: 6px 6px 0 rgba(230, 126, 34, 0.25);
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--surface), var(--bg2));
+            margin-bottom: 3rem;
+          "
+        >
+          <div
+            class="card-label"
+            style="
+              font-size: 0.85rem;
+              margin-bottom: 0.8rem;
+              color: var(--orange);
+            "
+          >
+            🧠 Зверни увагу!
+          </div>
+          <div
+            style="
+              font-size: 1.05rem;
+              line-height: 1.8;
+              color: var(--text);
+              font-weight: 600;
+              margin-bottom: 1rem;
+            "
+          >
+            На те, який саме метод <code>PrintName</code> викличеться — з класу
+            <code>Cow</code> чи <code>Whale</code> — впливає <br />
+            <span style="display: inline-block; margin: 0.3rem 0">
+              <strong
+                style="
+                  color: var(--accent);
+                  background: rgba(192, 57, 43, 0.1);
+                  padding: 0.2rem 0.6rem;
+                  border-radius: 6px;
+                  border: 1.5px dashed var(--accent);
+                "
+                >НЕ ТИП ЗМІННОЇ</strong
+              >, а
+              <strong
+                style="
+                  color: var(--green);
+                  background: rgba(39, 174, 96, 0.1);
+                  padding: 0.2rem 0.6rem;
+                  border-radius: 6px;
+                  border: 2px solid var(--green);
+                "
+                >ТИП ОБ'ЄКТА</strong
+              >, </span
+            ><br />
+            на який вона посилається.
+          </div>
+          <div
+            style="
+              height: 1px;
+              background: var(--border);
+              margin: 1rem 0;
+              opacity: 0.6;
+            "
+          ></div>
+          <div
+            style="
+              font-size: 0.95rem;
+              color: var(--text2);
+              line-height: 1.7;
+              font-weight: 600;
+            "
+          >
+            У змінній типу
+            <code style="color: var(--blue); font-weight: 800; font-size: 1rem"
+              >Cow</code
+            >
+            збережено посилання на об'єкт типу
+            <code style="color: var(--green); font-weight: 800; font-size: 1rem"
+              >Whale</code
+            >, і буде викликано метод <code>PrintName</code>, описаний у класі
+            <code style="color: var(--green); font-weight: 800; font-size: 1rem"
+              >Whale</code
+            >.
+            <br />
+            <strong
+              style="
+                color: var(--orange);
+                font-size: 1.1rem;
+                display: inline-block;
+                margin-top: 0.8rem;
+                border-bottom: 2px solid var(--orange);
+                padding-bottom: 1px;
+              "
+              >Це суть поліморфізму! ✨</strong
+            >
+          </div>
+        </div>
+
+        <!-- ВЕЛИКЕ І ЯСКРАВЕ ПРАВИЛО -->
+        <div class="ultimate-rule">
+          <div class="ultimate-rule-badge">
+            🚨 Найголовніше правило лекції! 🚨
+          </div>
+          <div class="ultimate-rule-icon">🧠🎯🔥</div>
+          <div class="ultimate-rule-content">
+            Набір методів, які можна викликати у змінної визначається
+            <strong>типом змінної</strong>.<br /><br />
+            А який саме метод / яка реалізація викликається, визначається
+            <strong>типом / класом об'єкта</strong>, посилання на який зберігає
+            змінна.
+          </div>
+        </div>
+
+        <div class="dialogue-container">
+          <div class="dialogue-body">
+            <div class="message">
+              <div class="avatar avatar-student">🤖</div>
+              <div class="bubble student">
+                <div class="speaker-name name-student">Аміго</div>
+                — Це не просто для розуміння.
+              </div>
+            </div>
+            <div class="message">
+              <div class="avatar avatar-teacher">👨‍🏫</div>
+              <div class="bubble teacher">
+                <div class="speaker-name name-teacher">Викладач</div>
+                — Так, це не дуже очевидно. Ти будеш постійно стикатися з цим,
+                тож незабаром зрозумієш і більше ніколи не забудеш.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MEMORY VIZ WIDGET -->
+        <div class="base-viz">
+          <div class="base-viz-title">🔍 Рентген Об'єкта в Пам'яті</div>
+          <div class="base-viz-desc">
+            Змінюй тип змінної та тип об'єкта, щоб побачити, що "бачить"
+            компілятор, а що лежить у пам'яті насправді.
+          </div>
+
+          <div class="cast-controls" style="margin-bottom: 1.5rem">
+            <div class="cast-select-wrap">
+              <div class="cast-label">Тип змінної</div>
+              <select
+                class="cast-select"
+                id="vizVarType"
+                onchange="updateBaseViz()"
+              >
+                <option value="Cow">Cow c = ...</option>
+                <option value="Whale">Whale w = ...</option>
+              </select>
+            </div>
+            <div class="cast-select-wrap">
+              <div class="cast-label">Тип об'єкта</div>
+              <select
+                class="cast-select"
+                id="vizObjType"
+                onchange="updateBaseViz()"
+              >
+                <option value="Whale">... new Whale();</option>
+                <option value="Cow">... new Cow();</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="base-layers" id="vizMemory">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- QUIZ 1 -->
+        <div class="quiz-section">
+          <div class="quiz-title">🧩 Перевір себе!</div>
+          <div class="quiz-question">
+            Є код: <code>Cow c = new Whale(); c.PrintName();</code> Що
+            виведеться на екран?
+          </div>
+          <div class="quiz-options" id="q1">
+            <div class="quiz-option" onclick="answer(this, 'q1', 'wrong')">
+              <div class="option-letter">A</div>
+              Я — корова
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q1', 'correct')">
+              <div class="option-letter">B</div>
+              Я — кит
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q1', 'wrong')">
+              <div class="option-letter">C</div>
+              Помилка компіляції
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q1', 'wrong')">
+              <div class="option-letter">D</div>
+              Нічого не виведеться
+            </div>
+          </div>
+          <div class="quiz-feedback" id="q1-fb"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SECTION 5 -->
+      <div class="section" id="sec5">
+        <h2 class="section-title">
+          <div class="section-num">5</div>
+          Розширення та звуження типів 📐
+        </h2>
+
+        <p class="prose">
+          Для посилальних типів, тобто класів, приведення типів працює не так,
+          як для примітивних типів. Хоча у посилальних типів теж є розширення та
+          звуження типу. Приклад:
+        </p>
+
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Розширення типу</th>
+              <th>Опис</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="code-block" style="margin: 0; box-shadow: none">
+                  <div class="code-body">
+                    <pre
+                      style="font-size: 0.85rem"
+                    ><span class="cls">Cow</span> cow = <span class="kw">new</span> <span class="cls">Whale</span>();</pre>
+                  </div>
+                </div>
+              </td>
+              <td>
+                Класичне розширення типу. Тепер кита узагальнили (розширили) до
+                корови, але у об'єкта типу <code>Whale</code> можна викликати
+                лише методи, описані в класі <code>Cow</code>.<br /><br />
+                Компілятор дозволить викликати у змінної <code>cow</code> лише
+                ті методи, що є у її типу — класу <code>Cow</code>.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="compare-table" style="margin-top: 1rem">
+          <thead>
+            <tr>
+              <th>Звуження типу</th>
+              <th>Опис</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="code-block" style="margin: 0; box-shadow: none">
+                  <div class="code-body">
+                    <pre
+                      style="font-size: 0.8rem"
+                    ><span class="cls">Cow</span> cow = <span class="kw">new</span> <span class="cls">Whale</span>();
+<span class="kw">if</span> (cow <span class="kw">is</span> <span class="cls">Whale</span> whale)
+{
+    whale.<span class="fn">PrintName</span>();
+}</pre>
+                  </div>
+                </div>
+              </td>
+              <td>
+                Класичне звуження типу з перевіркою. Змінна
+                <code>cow</code> типу <code>Cow</code> зберігає посилання на
+                об'єкт класу <code>Whale</code>.<br /><br />
+                Ми перевіряємо, що це саме так, і виконуємо операцію
+                перетворення (звуження) типу. Або як її ще називають —
+                <strong>downcast</strong>.<br /><br />
+                У C# сучасний спосіб — оператор
+                <code><strong>is</strong></code> з одночасним присвоєнням.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="code-block" style="margin: 0; box-shadow: none">
+                  <div class="code-body">
+                    <pre
+                      style="font-size: 0.8rem"
+                    ><span class="cls">Cow</span> cow = <span class="kw">new</span> <span class="cls">Cow</span>();
+<span class="cls">Whale</span> whale = (<span class="cls">Whale</span>) cow; <span class="cmt">// виняток!</span></pre>
+                  </div>
+                </div>
+              </td>
+              <td>
+                Посилальне звуження типу можна провести і без перевірки типу
+                об'єкта.<br /><br />
+                При цьому, якщо у змінній <code>cow</code> зберігався об'єкт не
+                класу <code>Whale</code>, буде згенеровано виняток —
+                <code><strong>InvalidCastException</strong></code
+                >.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="info-card tip">
+          <div class="card-label">✨ Порада для C#</div>
+          У сучасному C# найбезпечніший спосіб звуження типу — оператор
+          <code><strong>as</strong></code
+          >:<br /><br />
+          <code>Whale whale = cow <strong>as</strong> Whale;</code><br /><br />
+          Якщо приведення неможливе — <code>whale</code> буде <code>null</code>,
+          а не виняток. Завжди перевіряй на <code>null</code> після
+          <code>as</code>!
+        </div>
+
+        <!-- CASTING SIMULATOR -->
+        <div class="cast-sim">
+          <div class="cast-sim-title">🔮 Симулятор Приведення Типів</div>
+          <div class="cast-sim-desc">
+            Створи об'єкт і спробуй його явно привести до іншого типу (Downcast
+            / Upcast). Перевір, чи виникне виняток!
+          </div>
+          <div class="cast-controls">
+            <div class="cast-select-wrap">
+              <div class="cast-label">1. Створюємо:</div>
+              <select class="cast-select" id="castCreate">
+                <option value="Whale">new Whale()</option>
+                <option value="Cow">new Cow()</option>
+                <option value="object">new object()</option>
+              </select>
+            </div>
+            <div class="cast-select-wrap">
+              <div class="cast-label">2. Приводимо до типу:</div>
+              <select class="cast-select" id="castToTarget">
+                <option value="Cow">(Cow)</option>
+                <option value="Whale">(Whale)</option>
+                <option value="object">(object)</option>
+              </select>
+            </div>
+            <button class="cast-run-btn" onclick="runCastSim()">
+              Виконати Cast!
+            </button>
+          </div>
+          <div class="cast-result" id="castRes">
+            <span style="color: #555"
+              >// Натисни "Виконати Cast!", щоб побачити результат...</span
+            >
+          </div>
+        </div>
+
+        <!-- QUIZ 2 -->
+        <div class="quiz-section">
+          <div class="quiz-title">🧩 Перевір себе!</div>
+          <div class="quiz-question">
+            Що станеться з кодом:
+            <code>Cow cow = new Cow(); Whale w = (Whale)cow;</code>?
+          </div>
+          <div class="quiz-options" id="q2">
+            <div class="quiz-option" onclick="answer(this, 'q2', 'wrong')">
+              <div class="option-letter">A</div>
+              Все спрацює нормально
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q2', 'wrong')">
+              <div class="option-letter">B</div>
+              Помилка компіляції
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q2', 'correct')">
+              <div class="option-letter">C</div>
+              Виняток InvalidCastException під час виконання
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q2', 'wrong')">
+              <div class="option-letter">D</div>
+              Поверне null
+            </div>
+          </div>
+          <div class="quiz-feedback" id="q2-fb"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SECTION 6 -->
+      <div class="section" id="sec6">
+        <h2 class="section-title">
+          <div class="section-num">6</div>
+          А тепер іще на закуску.<br />Виклик оригінального методу 🎁
+        </h2>
+
+        <p class="prose">
+          Іноді тобі хочеться не замінити успадкований метод на свій при
+          перевизначенні методу, а лише трохи доповнити його.
+        </p>
+
+        <p class="prose">
+          У цьому випадку дуже хочеться виконати в новому методі свій код і
+          викликати цей самий метод, але базового класу. І така можливість у C#
+          є. Робиться це так: <code>base.Method()</code>.
+        </p>
+
+        <p class="prose">Приклади:</p>
+
+        <div class="code-table">
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">C# — base.PrintName()</span>
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">class</span> <span class="cls">Cow</span>
+{
+    <span class="kw">public virtual void</span> <span class="fn">PrintAll</span>()
+    {
+        <span class="fn">PrintColor</span>();
+        <span class="fn">PrintName</span>();
+    }
+
+    <span class="kw">public virtual void</span> <span class="fn">PrintColor</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — білий"</span>);
+    }
+
+    <span class="kw">public virtual void</span> <span class="fn">PrintName</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — корова"</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="cls">Whale</span> : <span class="cls">Cow</span>
+{
+    <span class="kw">public override void</span> <span class="fn">PrintName</span>()
+    {
+        Console.<span class="fn">Write</span>(<span class="str">"Це неправда: "</span>);
+        <span class="kw">base</span>.<span class="fn">PrintName</span>();
+
+        Console.<span class="fn">WriteLine</span>(<span class="str">"Я — кит"</span>);
+    }
+}</pre>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">C# — Виклик</span>
+                <button class="copy-btn" onclick="copyCode(this)">
+                  Копіювати
+                </button>
+              </div>
+              <div class="code-body">
+                <pre><span class="kw">static void</span> <span class="fn">Main</span>(<span class="kw">string</span>[] args)
+{
+    <span class="cls">Whale</span> whale = <span class="kw">new</span> <span class="cls">Whale</span>();
+    whale.<span class="fn">PrintAll</span>();
+}</pre>
+              </div>
+            </div>
+            <div class="output-label">📟 Виведе на екран:</div>
+            <div class="output-box">
+              Я — білий<br />Це неправда: Я — корова<br />Я — кит
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card info">
+          У C# для виклику методу батьківського класу використовується
+          <strong><code>base.Метод()</code></strong
+          >. <br />Аналогічно, як і викликаються конструктори батьківських
+          класів!
+        </div>
+
+        <!-- QUIZ 3 -->
+        <div class="quiz-section">
+          <div class="quiz-title">🧩 Фінальний тест!</div>
+          <div class="quiz-question">
+            Яке ключове слово використовується в C# для виклику методу
+            батьківського класу?
+          </div>
+          <div class="quiz-options" id="q3">
+            <div class="quiz-option" onclick="answer(this, 'q3', 'wrong')">
+              <div class="option-letter">A</div>
+              super.Method()
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q3', 'correct')">
+              <div class="option-letter">B</div>
+              base.Method()
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q3', 'wrong')">
+              <div class="option-letter">C</div>
+              parent.Method()
+            </div>
+            <div class="quiz-option" onclick="answer(this, 'q3', 'wrong')">
+              <div class="option-letter">D</div>
+              this.base.Method()
+            </div>
+          </div>
+          <div class="quiz-feedback" id="q3-fb"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- FLASHCARDS WIDGET -->
+      <div class="flash-box">
+        <div class="flash-title">🗂️ Закріпимо термінологію (Флеш-картки)</div>
+        <div class="flash-desc">
+          Клікай на картку, щоб перевернути її. Запам'ятай ключові терміни ООП.
+        </div>
+
+        <div class="flash-card-wrap">
+          <div class="flash-card" id="fc" onclick="flipCard()">
+            <div class="flash-front" id="fc-front">Поліморфізм</div>
+            <div class="flash-back" id="fc-back">
+              Здатність різних класів по-різному реагувати на виклик одного й
+              того самого методу.
+            </div>
+          </div>
+        </div>
+
+        <div class="flash-hint">Клікни по картці 👆</div>
+
+        <div class="flash-nav">
+          <button class="flash-nav-btn" onclick="prevCard()">
+            ← Попередня
+          </button>
+          <div class="flash-counter"><span id="fc-curr">1</span> / 5</div>
+          <button class="flash-nav-btn" onclick="nextCard()">Наступна →</button>
+        </div>
+      </div>
+
+      <!-- SORTING WIDGET -->
+      <div class="sort-box">
+        <div class="sort-title">🧩 Міні-гра: Встанови відповідність</div>
+        <div class="sort-desc">
+          Перетягни блоки так, щоб код збігався з результатом!
+        </div>
+
+        <div style="display: flex; gap: 1rem">
+          <div style="flex: 1">
+            <div
+              style="
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                color: var(--text3);
+              "
+            >
+              Код
+            </div>
+            <div
+              style="
+                background: var(--bg2);
+                padding: 1rem;
+                border-radius: 10px;
+                border: 2px solid var(--border);
+                margin-bottom: 0.5rem;
+              "
+            >
+              <code>Whale w = new Whale(); w.PrintName();</code>
+            </div>
+            <div
+              style="
+                background: var(--bg2);
+                padding: 1rem;
+                border-radius: 10px;
+                border: 2px solid var(--border);
+                margin-bottom: 0.5rem;
+              "
+            >
+              <code>Cow c = new Whale(); c.PrintName();</code>
+            </div>
+            <div
+              style="
+                background: var(--bg2);
+                padding: 1rem;
+                border-radius: 10px;
+                border: 2px solid var(--border);
+                margin-bottom: 0.5rem;
+              "
+            >
+              <code>Cow c = new Cow(); c.PrintName();</code>
+            </div>
+          </div>
+
+          <div style="flex: 1">
+            <div
+              style="
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                color: var(--text3);
+              "
+            >
+              Результат (Перетягуй 👇)
+            </div>
+            <div class="sort-list" id="sortList">
+              <div class="sort-item" draggable="true" data-id="c">
+                <span class="sort-handle">☰</span> Я — корова
+              </div>
+              <div class="sort-item" draggable="true" data-id="w1">
+                <span class="sort-handle">☰</span> Я — кит
+              </div>
+              <div class="sort-item" draggable="true" data-id="w2">
+                <span class="sort-handle">☰</span> Я — кит
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="sort-check-btn" onclick="checkSort()">
+          Перевірити!
+        </button>
+        <div class="sort-result" id="sortRes"></div>
+      </div>
+
+      <!-- FINAL -->
+      <div class="dialogue-container">
+        <div class="dialogue-body">
+          <div class="message">
+            <div class="avatar avatar-student">🤖</div>
+            <div class="bubble student">
+              <div class="speaker-name name-student">Аміго</div>
+              — Гм. Ого, яка лекція. Мої робо-вуха мало не розплавилися.
+            </div>
+          </div>
+          <div class="message">
+            <div class="avatar avatar-teacher">👨‍🏫</div>
+            <div class="bubble teacher">
+              <div class="speaker-name name-teacher">Викладач</div>
+              — Так, це непростий матеріал, він один з найскладніших. Але тепер
+              ти знаєш поліморфізм! Практикуйся — і все стане зрозумілим. 🚀
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINAL CARD -->
+      <div class="final-card">
+        <span class="final-emoji">🐋</span>
+        <h2>Дякую за увагу!</h2>
+        <p>P.S.: до цієї сторінки ти звертатимешся ще БАГАТО разів! 💯</p>
+      </div>
+    </div>
+    <!-- /page-wrapper -->
+
+    <!-- SECTION 2 -->
+
+    <p style="text-align: center">© 2026 GlebKievsky. Всі права захищено.</p>
+    <br />
+
+    <script>
+      // ===== THEME =====
+      function setTheme(t) {
+        document.body.setAttribute("data-theme", t);
+        localStorage.setItem("theme", t);
+
+        document.querySelectorAll(".theme-btn").forEach((b) => {
+          b.classList.toggle("active", b.getAttribute("data-t") === t);
+        });
+      }
+
+      // ===== PROGRESS & TOC =====
+      window.addEventListener("scroll", () => {
+        const el = document.documentElement;
+        const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+        document.getElementById("progressBar").style.width = pct + "%";
+      });
+
+      const sections = document.querySelectorAll(".section");
+      const observerOptions = { root: null, rootMargin: "0px", threshold: 0.3 };
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("id");
+            const check = document.getElementById("check-" + id);
+            if (check) check.classList.add("done");
+          }
+        });
+      }, observerOptions);
+      sections.forEach((sec) => observer.observe(sec));
+
+      // ===== COPY CODE =====
+      function copyCode(btn) {
+        const pre = btn.closest(".code-block").querySelector("pre");
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+          btn.textContent = "✓ Скопійовано";
+          btn.classList.add("copied");
+          setTimeout(() => {
+            btn.textContent = "Копіювати";
+            btn.classList.remove("copied");
+          }, 2000);
+        });
+      }
+
+      // ===== SECTION 4 TAB CONTROLS (DYNAMIC DISPATCH VIZ) =====
+      function openDynTab(num, el) {
+        // Всі таби неактивні
+        document
+          .querySelectorAll(".dyn-viz-tab")
+          .forEach((t) => t.classList.remove("active"));
+        // Поточний таб активний
+        el.classList.add("active");
+
+        // Всі тіла неактивні
+        document
+          .querySelectorAll(".dyn-viz-body")
+          .forEach((b) => b.classList.remove("active"));
+        // Поточне тіло активне
+        document.getElementById("dyn-tab-" + num).classList.add("active");
+      }
+
+      // ===== DEMO 1 =====
+      let selectedCard = null;
+      function selectAnimal(type, el) {
+        if (selectedCard) selectedCard.classList.remove("selected");
+        selectedCard = el;
+        el.classList.add("selected");
+        const out = document.getElementById("demoOutput");
+        out.classList.add("active");
+        const lines = {
+          cow: [
+            '<span style="color:#569cd6">// Cow cow = new Cow();</span>',
+            '<span style="color:#569cd6">// cow.PrintAll();</span>',
+            "",
+            '<span style="color:#2ecc71">Я — біла</span>',
+            '<span style="color:#2ecc71">Я — корова</span>',
+          ],
+          whale: [
+            '<span style="color:#569cd6">// Whale whale = new Whale();</span>',
+            '<span style="color:#569cd6">// whale.PrintAll();</span>',
+            "",
+            '<span style="color:#2ecc71">Я — біла</span>',
+            '<span style="color:#e67e22">// ↑ PrintColor() з Cow — не перевизначений</span>',
+            '<span style="color:#2ecc71">Я — кит</span>',
+            '<span style="color:#e67e22">// ↑ PrintName() з Whale — перевизначений!</span>',
+          ],
+          "whale-as-cow": [
+            '<span style="color:#569cd6">// Cow cow = new Whale();</span>',
+            '<span style="color:#569cd6">// cow.PrintAll();</span>',
+            "",
+            '<span style="color:#2ecc71">Я — біла</span>',
+            '<span style="color:#2ecc71">Я — кит</span>',
+            '<span style="color:#e67e22">// Тип змінної = Cow, але тип об\'єкта = Whale!</span>',
+            '<span style="color:#e67e22">// Тому викликається PrintName() кита 🐋</span>',
+          ],
+        };
+        out.innerHTML = lines[type].join("\n");
+      }
+
+      // ===== TRACER =====
+      let currentTraceStep = 0;
+      const maxTraceSteps = 5;
+      const traceOutputContent = [
+        "",
+        "&gt; Починаємо виконання...",
+        "&gt; Зайшли в PrintAll() класу Cow...",
+        "Я — біла",
+        "&gt; Готуємось викликати PrintName()...",
+        "Я — біла<br>Я — кит",
+      ];
+
+      function nextTrace() {
+        if (currentTraceStep >= maxTraceSteps) return;
+
+        // Mark previous as done
+        if (currentTraceStep > 0) {
+          document
+            .getElementById("ts" + currentTraceStep)
+            .classList.remove("active");
+          document
+            .getElementById("ts" + currentTraceStep)
+            .classList.add("done");
+        }
+
+        currentTraceStep++;
+
+        // Make current active
+        const ts = document.getElementById("ts" + currentTraceStep);
+        ts.classList.remove("done");
+        ts.classList.add("active");
+
+        // Update output
+        document.getElementById("tracerOut").innerHTML =
+          '<div class="trace-out-line">' +
+          traceOutputContent[currentTraceStep] +
+          "</div>";
+
+        if (currentTraceStep === maxTraceSteps) {
+          document.getElementById("btnNextTrace").style.display = "none";
+          document.getElementById("btnResetTrace").style.display =
+            "inline-block";
+        }
+      }
+
+      function resetTrace() {
+        currentTraceStep = 0;
+        for (let i = 1; i <= maxTraceSteps; i++) {
+          const el = document.getElementById("ts" + i);
+          el.classList.remove("active", "done");
+        }
+        document.getElementById("ts1").classList.add("active");
+        currentTraceStep = 1;
+        document.getElementById("tracerOut").innerHTML =
+          '<div class="trace-out-line">' + traceOutputContent[1] + "</div>";
+
+        document.getElementById("btnNextTrace").style.display = "inline-block";
+        document.getElementById("btnResetTrace").style.display = "none";
+      }
+
+      // ===== MEMORY VIZ =====
+      function updateBaseViz() {
+        const varTypeEl = document.getElementById("vizVarType");
+        const objTypeEl = document.getElementById("vizObjType");
+        const container = document.getElementById("vizMemory");
+
+        // Safety check to prevent errors
+        if (!varTypeEl || !objTypeEl || !container) return;
+
+        const varType = varTypeEl.value;
+        const objType = objTypeEl.value;
+
+        if (varType === "Whale" && objType === "Cow") {
+          container.innerHTML = `<div style="color:var(--accent); font-weight:bold; padding: 2rem; text-align: center; border: 2px dashed var(--accent); border-radius: 12px; margin-top: 1rem;">
+        <span style="font-size: 1.2rem;">❌ Помилка компіляції!</span><br>Змінній типу Whale не можна присвоїти об'єкт Cow.<br>
+        <small style="color:var(--text3); display:block; margin-top:0.5rem;">(Кит не може бути "просто коровою")</small>
+        
+        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(192,57,43,0.05); border: 1.5px solid var(--accent); border-radius: 10px; font-size: 0.95rem; color: var(--text); font-weight: 600; line-height: 1.6; text-align: left;">
+          💡 <strong style="color: var(--accent); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">Підказка:</strong> Cast не змінює об’єкт. Він лише перевіряє, чи можна дивитися на нього як на інший тип!<br><br>
+          Корова не має всіх можливостей кита (наприклад, методу <code>Swim()</code>). Якщо компілятор це дозволить, програма впаде при першій же спробі викликати такий метод.
+        </div>
+      </div>`;
+          return;
+        }
+
+        let cowPrintNameStatus = "";
+        let cowLayerClass = "active-layer";
+        let whaleLayerHTML = "";
+
+        if (objType === "Cow") {
+          cowPrintNameStatus = `<span class="viz-badge badge-ok">✓ Виконається цей метод</span>`;
+          whaleLayerHTML = `
+        <div class="base-layer disabled-layer">
+          <div class="base-layer-name">🐋 Зона класу WHALE</div>
+          <div style="text-align:center; padding: 2.5rem 0; font-weight:700; color:var(--text3); display:flex; flex-direction:column; gap:0.5rem; align-items:center;">
+            <span style="font-size:2.5rem; filter: grayscale(1); opacity: 0.5;">🐋</span>
+            <span>Відсутня в пам'яті<br><small>(Об'єкт є звичайною Коровою)</small></span>
+          </div>
+        </div>
+      `;
+        } else {
+          // obj is Whale
+          cowPrintNameStatus = `<span class="viz-badge badge-redirect">↪ Перенаправлення (override)</span>`;
+
+          let swimLine = "";
+          if (varType === "Cow") {
+            swimLine = `
+          <div class="base-line locked">
+            <div>public void Swim()</div>
+            <span class="viz-badge badge-lock">🔒 Приховано типом змінної Cow</span>
+          </div>
+        `;
+          } else {
+            swimLine = `
+          <div class="base-line hl">
+            <div>public void Swim()</div>
+            <span class="viz-badge badge-ok">✓ Доступно для виклику</span>
+          </div>
+        `;
+          }
+
+          whaleLayerHTML = `
+        <div class="base-layer active-layer" style="border-color: var(--blue);">
+          <div class="base-layer-name" style="color:var(--blue)">🐋 Зона класу WHALE (Спадкоємець)</div>
+          <div class="base-line hl">
+            <div>public override void PrintName()</div>
+            <span class="viz-badge badge-ok">✓ Виконається саме цей метод!</span>
+          </div>
+          ${swimLine}
+        </div>
+      `;
+        }
+
+        const cowLayerHTML = `
+      <div class="base-layer ${cowLayerClass}">
+        <div class="base-layer-name">🐄 Зона класу COW (Базова)</div>
+        <div class="base-line hl">
+          <div>public virtual void PrintColor()</div>
+          <span class="viz-badge badge-ok">✓ Доступно завжди</span>
+        </div>
+        <div class="base-line">
+          <div>public virtual void PrintName()</div>
+          ${cowPrintNameStatus}
+        </div>
+      </div>
+    `;
+
+        container.innerHTML = `<div class="viz-grid">${cowLayerHTML}${whaleLayerHTML}</div>`;
+      }
+
+      // Initialize visualization safely
+      window.addEventListener("DOMContentLoaded", updateBaseViz);
+
+      // ===== CAST SIMULATOR =====
+      function runCastSim() {
+        const from = document.getElementById("castCreate").value;
+        const to = document.getElementById("castToTarget").value;
+        const res = document.getElementById("castRes");
+
+        let output = `<span style="color:#569cd6">object</span> obj = <span style="color:#569cd6">new</span> ${from}();<br>`;
+        output += `<span style="color:#569cd6">${to}</span> target = (<span style="color:#569cd6">${to}</span>) obj;<br><br>`;
+
+        if (from === to) {
+          output += `<span class="cast-ok">✓ Успішно! Об'єкт і цільовий тип співпадають.</span>`;
+        } else if (from === "Whale" && to === "Cow") {
+          output += `<span class="cast-ok">✓ Успішно (Upcast)! Будь-який Whale також є Cow. Неявне приведення.</span>`;
+        } else if (from === "Whale" && to === "object") {
+          output += `<span class="cast-ok">✓ Успішно (Upcast)! Будь-який клас успадковує object.</span>`;
+        } else if (from === "Cow" && to === "object") {
+          output += `<span class="cast-ok">✓ Успішно (Upcast)!</span>`;
+        } else {
+          output += `<span class="cast-err">❌ InvalidCastException! В пам'яті лежить ${from}, його не можна перетворити на ${to} (Downcast без відповідного типу).</span>`;
+        }
+
+        res.innerHTML = output;
+      }
+
+      // ===== FLASHCARDS =====
+      const flashData = [
+        {
+          f: "Поліморфізм",
+          b: "Здатність різних класів по-різному реагувати на виклик одного й того самого методу.",
+        },
+        {
+          f: "virtual",
+          b: "Ключове слово C#, яке дозволяє перевизначити метод у класах-нащадках.",
+        },
+        {
+          f: "override",
+          b: "Ключове слово C# для перевизначення (заміни) віртуального методу базового класу.",
+        },
+        {
+          f: "base",
+          b: "Використовується для доступу до методів та властивостей батьківського (базового) класу.",
+        },
+        {
+          f: "Upcast",
+          b: "Приведення від класу-нащадка до батьківського класу (завжди безпечно).",
+        },
+      ];
+      let currFlash = 0;
+
+      function updateFlash() {
+        const card = document.getElementById("fc");
+        card.classList.remove("flipped");
+        setTimeout(() => {
+          document.getElementById("fc-front").textContent =
+            flashData[currFlash].f;
+          document.getElementById("fc-back").textContent =
+            flashData[currFlash].b;
+          document.getElementById("fc-curr").textContent = currFlash + 1;
+        }, 150);
+      }
+      function flipCard() {
+        document.getElementById("fc").classList.toggle("flipped");
+      }
+      function nextCard() {
+        currFlash = (currFlash + 1) % flashData.length;
+        updateFlash();
+      }
+      function prevCard() {
+        currFlash = (currFlash - 1 + flashData.length) % flashData.length;
+        updateFlash();
+      }
+
+      // ===== DRAG AND DROP (SORT) =====
+      const sortList = document.getElementById("sortList");
+      let draggedItem = null;
+
+      sortList.addEventListener("dragstart", (e) => {
+        draggedItem = e.target;
+        e.target.classList.add("dragging");
+      });
+
+      sortList.addEventListener("dragend", (e) => {
+        e.target.classList.remove("dragging");
+        const items = [...sortList.querySelectorAll(".sort-item")];
+        items.forEach((item) => item.classList.remove("drag-over"));
+      });
+
+      sortList.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(sortList, e.clientY);
+        const dragging = document.querySelector(".dragging");
+        if (afterElement == null) {
+          sortList.appendChild(dragging);
+        } else {
+          sortList.insertBefore(dragging, afterElement);
+        }
+      });
+
+      function getDragAfterElement(container, y) {
+        const draggableElements = [
+          ...container.querySelectorAll(".sort-item:not(.dragging)"),
+        ];
+        return draggableElements.reduce(
+          (closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+              return { offset: offset, element: child };
+            } else {
+              return closest;
+            }
+          },
+          { offset: Number.NEGATIVE_INFINITY },
+        ).element;
+      }
+
+      function checkSort() {
+        const items = [...sortList.querySelectorAll(".sort-item")];
+        const order = items
+          .map((item) => item.getAttribute("data-id"))
+          .join(",");
+        const res = document.getElementById("sortRes");
+        res.classList.add("show");
+
+        // Correct order matching HTML structure above: w1, w2, c
+        if (order === "w1,w2,c" || order === "w2,w1,c") {
+          res.innerHTML =
+            '<span style="color:var(--green)">🎉 Ідеально! Ти все зрозумів правильно!</span>';
+        } else {
+          res.innerHTML =
+            "<span style=\"color:var(--accent)\">❌ Ще не зовсім. Подумай, де який об'єкт у пам'яті створюється.</span>";
+        }
+      }
+
+      // ===== QUIZ =====
+      const feedbacks = {
+        "q-sec2": {
+          correct:
+            "🎉 Правильно! Неважливо, де написаний метод (у базовому класі). Важливо, який ТИП ОБ'ЄКТА. Оскільки це Whale, то і PrintName() викличеться його власний.",
+          wrong:
+            "❌ Неправильно. Згадай: коли об'єкт типу Whale, він використовує СВІЙ перевизначений метод, навіть якщо його викликає базовий код.",
+        },
+        q1: {
+          correct:
+            "🎉 Правильно! Тип об'єкта — Whale, тому викличеться його метод PrintName(), який виводить «Я — кит».",
+          wrong:
+            "❌ Спробуй ще раз! Пам'ятай: важливий тип ОБ'ЄКТА, а не тип змінної.",
+        },
+        q2: {
+          correct:
+            "🎉 Правильно! Cow не є Whale — звуження неможливе без реального об'єкта типу Whale. Станеться InvalidCastException.",
+          wrong:
+            "❌ Не зовсім. Код скомпілюється, але під час виконання виникне виняток InvalidCastException.",
+        },
+        q3: {
+          correct:
+            "🎉 Правильно! У C# для виклику методу батьківського класу використовується ключове слово base.",
+          wrong:
+            "❌ Не так! У Java це super, але в C# — base.Method(). Не переплутай!",
+        },
+      };
+
+      function retryQuiz(qid) {
+        const container = document.getElementById(qid);
+        container.classList.remove("answered");
+        container.querySelectorAll(".quiz-option").forEach((o) => {
+          o.style.pointerEvents = "auto";
+          o.classList.remove("correct", "wrong");
+        });
+        const fb = document.getElementById(qid + "-fb");
+        fb.className = "quiz-feedback";
+        fb.innerHTML = "";
+      }
+
+      function answer(el, qid, result) {
+        const container = document.getElementById(qid);
+        if (container.classList.contains("answered")) return;
+
+        container.classList.add("answered");
+        container
+          .querySelectorAll(".quiz-option")
+          .forEach((o) => (o.style.pointerEvents = "none"));
+        el.classList.add(result);
+
+        const fb = document.getElementById(qid + "-fb");
+        const isCorrect = result === "correct";
+        const msg = isCorrect ? feedbacks[qid].correct : feedbacks[qid].wrong;
+
+        fb.innerHTML = `<span>${msg}</span><button class="retry-btn" onclick="retryQuiz('${qid}')">Спробувати ще 🔄</button>`;
+        fb.className = "quiz-feedback show " + (isCorrect ? "ok" : "fail");
+      }
+    </script>
+  </body>
+</html>
